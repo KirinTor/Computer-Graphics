@@ -1,0 +1,172 @@
+<html>
+<head>
+<title>Computer Graphics Lab.5</title>
+
+<style>
+	html, body {
+		min-height:600px;       
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      body {
+        overflow: auto;
+      }
+      main {
+	min-height: 100%;
+      }
+	  div {height:600px;
+	  }
+    </style>
+
+<script language = "Javascript">
+var action, p_move=25;
+var goDwn, goRgt;
+var cntX, cntY, cntW, cntH;
+var idTmr;
+
+var kvdt;
+
+var kvdtW2, kvdtH2;
+
+function getPos(el) {
+   
+    for (var lx=0, ly=0;
+         el != null;
+         lx += el.offsetLeft, ly += el.offsetTop, el = el.offsetParent);
+    return {x: lx,y: ly};
+}
+
+var path = [], t1, t2;
+var step;
+
+function pathLine( p1, p2, stepLength){
+	t1 = Math.abs(p1.x - p2.x);
+	t2 = Math.abs(p1.y - p2.y);	
+	var hypoten = Math.sqrt(t1*t1 + t2*t2);	
+	var cnt = Math.ceil(hypoten / stepLength);
+	t1 = (p2.x - p1.x) / cnt;
+	t2 = (p2.y - p1.y) / cnt;	
+	var points = [];
+
+	for ( i =1; i <= cnt; i++){
+		points.push({x:p1.x + t1*i, y:p1.y + t2*i});
+	}
+	return points;
+}
+function startRose(){
+	
+	clearInterval(idTmr);
+	
+	var cnt = document.getElementById("dynamic");
+	cntW = cnt.clientWidth;
+	cntH = cnt.clientHeight;	
+	
+	var f = getPos(cnt);
+	cntX = f.x;
+	cntY = f.y;
+
+	var cnt = {};
+	cnt.x = cntX + cntW/2;
+	cnt.y = cntY + cntH/2;
+	
+	kvdt = document.getElementById("kvad")
+	kvdtW2 = kvdt.offsetWidth /2 ;
+	kvdtH2 = kvdt.offsetHeight /2;
+	
+	/*var pnt = {};
+	pnt.x = 0;
+	pnt.y = 0;
+	*/
+	var bdr = Math.min(cntW, cntH) * 2 / 6;
+	var f = 0;
+	var r;	
+	
+	path.length = 0;
+	
+	while (f<=2*Math.PI) {
+		pnt = r = Math.sin(3*f);
+		path.push(
+		{
+			x:cnt.x + bdr*r*Math.cos(f) - kvdtW2,
+			y:cnt.y - bdr*r*Math.sin(f) - kvdtH2 - cntH/12
+		});
+
+		f = f + 0.05;
+		
+	}
+	
+	step =0;
+	idTmr =window.setInterval("move()", 50);
+	
+}
+function startRomb(){
+	path.length = 0;
+	clearInterval(idTmr);
+	var cnt = document.body;// getElementById("dynamic");
+	cntW = cnt.clientWidth;
+	cntH = cnt.clientHeight;	
+	
+	var f = getPos(cnt);
+	cntX = f.x;
+	cntY = f.y;
+	
+	kvdt = document.getElementById("kvad")
+	kvdtW2 = kvdt.offsetWidth /2 ;
+	kvdtH2 = kvdt.offsetHeight /2;
+	
+	var dots = [{x:0,y:0},
+				{x:0,y:0},
+				{x:0,y:0},
+				{x:0,y:0}];
+	dots[0].x = cntX;
+	dots[0].y = cntY + cntH/2 - kvdtH2;
+	
+	dots[1].x = cntX + cntW/2 - kvdtW2;
+	dots[1].y = cntY + cntH - kvdtH2 * 2;
+	
+	dots[2].x = cntX + cntW - kvdtW2 * 2;
+	dots[2].y = cntY + cntH/2 - kvdtH2;
+	
+	dots[3].x = cntX + cntW/2 - kvdtW2;
+	dots[3].y = cntY + 20;
+	var j;
+	var i;
+	for ( i = 0; i< dots.length; i++)
+	{
+		if( i != 3)
+		{
+			j =pathLine( dots[i], dots[i+1], p_move);
+			path = path.concat(j);
+		}
+		else
+		{
+			j =pathLine( dots[i], dots[0], p_move);
+			path = path.concat(j);
+		}
+	}	
+		
+	
+	idTmr =window.setInterval("move()", 50);
+	step =0;
+}
+function move(){
+	
+	kvdt.style.left = Math.round(path[step].x) + 'px';
+	kvdt.style.top = Math.round(path[step].y) + 'px';
+
+step++;
+if(path.length <= step)
+	step = 0;
+	
+}
+</script>
+</head>
+<body >
+<input type="button" onClick="startRomb()" value="Go Romb">
+<input type="button" onClick="startRose()" value="Go Rose">
+<div id="dynamic" style="background-color: #00F;">
+<img id="kvad" src="kvad.gif" style="position:fixed;" >
+</div>
+</body>
+</html>
